@@ -4,6 +4,11 @@ from app.mcp.tools.student_tools import (
     get_students_tool
 )
 
+from app.mcp.tools.mark_tools import (
+    add_mark_tool,
+    get_marks_tool
+)
+
 mcp = FastMCP("TeacherAssist-MCP")
 
 
@@ -32,6 +37,24 @@ def get_students():
         List of all students.
     """
     return get_students_tool()
+
+
+@mcp.tool()
+def add_mark(
+    student_id: int,
+    subject: str,
+    marks: int
+):
+    return add_mark_tool(
+        student_id,
+        subject,
+        marks
+    )
+
+
+@mcp.tool()
+def get_marks():
+    return get_marks_tool()
 
 
 if __name__ == "__main__":
