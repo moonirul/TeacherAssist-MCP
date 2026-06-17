@@ -1,15 +1,19 @@
 # TeacherAssist-MCP
 
-AI-powered Teacher Assistance MCP Server built with FastMCP, PostgreSQL, and SQLAlchemy.
+AI-powered Teacher Assistant MCP Server built with FastMCP, FastAPI, PostgreSQL, SQLAlchemy, and Email Notifications.
 
-This project demonstrates how to create a Model Context Protocol (MCP) server that allows AI assistants such as Claude Desktop to manage student records through MCP tools.
+This project demonstrates how to build a Model Context Protocol (MCP) server that allows AI assistants such as Claude Desktop to manage student records through MCP tools while automatically sending registration emails to students.
+
+---
 
 ## Features
 
 * Create students
 * Retrieve all students
+* Email notification on student registration
 * PostgreSQL database integration
 * SQLAlchemy ORM
+* FastAPI REST API
 * Claude Desktop MCP integration
 * MCP Inspector support
 * Beginner-friendly project structure
@@ -20,9 +24,12 @@ This project demonstrates how to create a Model Context Protocol (MCP) server th
 
 * Python 3.11+
 * FastMCP
+* FastAPI
 * PostgreSQL
 * SQLAlchemy
 * Psycopg2
+* SMTP (Gmail)
+* UV Package Manager
 * Claude Desktop
 * MCP Inspector
 
@@ -40,8 +47,12 @@ TeacherAssist-MCP/
 │   ├── models/
 │   │   └── student.py
 │   │
+│   ├── schemas/
+│   │   └── student.py
+│   │
 │   ├── services/
-│   │   └── student_service.py
+│   │   ├── student_service.py
+│   │   └── email_service.py
 │   │
 │   ├── mcp/
 │   │   ├── server.py
@@ -51,9 +62,10 @@ TeacherAssist-MCP/
 │   └── main.py
 │
 ├── .env
-├── requirements.txt
+├── pyproject.toml
+├── uv.lock
 ├── README.md
-└── pyproject.toml
+└── .venv/
 ```
 
 ---
@@ -62,16 +74,18 @@ TeacherAssist-MCP/
 
 Install:
 
-* Python 3.11 or newer
+* Python 3.11+
 * PostgreSQL
 * Git
+* UV
 
-Verify installations:
+Verify:
 
 ```bash
 python --version
-psql --version
 git --version
+psql --version
+uv --version
 ```
 
 ---
@@ -86,99 +100,85 @@ cd TeacherAssist-MCP
 
 ---
 
-## Create Virtual Environment
+## Install Dependencies
+
+Using UV:
+
+```bash
+uv sync
+```
+
+Activate environment:
 
 ### Windows
 
 ```bash
-python -m venv .venv
-
 .venv\Scripts\activate
 ```
 
-### Linux / macOS
+### Linux/macOS
 
 ```bash
-python3 -m venv .venv
-
 source .venv/bin/activate
-```
-
----
-
-## Install Dependencies
-
-Using pip:
-
-```bash
-pip install -r requirements.txt
-```
-
-Or using uv:
-
-```bash
-uv sync
 ```
 
 ---
 
 ## PostgreSQL Setup
 
-Create a database:
+Create database:
 
 ```sql
 CREATE DATABASE teacherassist;
 ```
 
-Create a PostgreSQL user if needed:
+Example connection:
 
-```sql
-CREATE USER teacheruser WITH PASSWORD 'password';
-
-GRANT ALL PRIVILEGES ON DATABASE teacherassist TO teacheruser;
+```env
+DATABASE_URL=postgresql://postgres:password@localhost:5432/teacherassist
 ```
 
 ---
 
-## Environment Variables
+## Email Configuration
 
-Create a `.env` file in the project root.
-
-```env
-DATABASE_URL=postgresql://teacheruser:password@localhost:5432/teacherassist
-```
-
-Example:
+Create a `.env` file:
 
 ```env
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/teacherassist
+DATABASE_URL=postgresql://postgres:password@localhost:5432/teacherassist
+
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASSWORD=your_gmail_app_password
 ```
+
+### Gmail Setup
+
+1. Enable 2-Step Verification
+2. Open Google Account Security
+3. Generate App Password
+4. Use the generated password as `EMAIL_PASSWORD`
+
+Do NOT use your Gmail login password.
 
 ---
 
-## Database Initialization
+## Run FastAPI Server
 
-Start PostgreSQL.
-
-Run the project once to create tables automatically if your project uses:
-
-```python
-Base.metadata.create_all(bind=engine)
+```bash
+uv run uvicorn app.main:app --reload
 ```
 
-Otherwise create tables manually.
+Open:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+Swagger UI will be available for testing APIs.
 
 ---
 
 ## Run MCP Server
-
-### Method 1
-
-```bash
-python -m app.mcp.server
-```
-
-### Method 2
 
 ```bash
 uv run python -m app.mcp.server
@@ -195,68 +195,57 @@ transport 'stdio'
 
 ## Test Using MCP Inspector
 
-Install Inspector:
-
-```bash
-npx @modelcontextprotocol/inspector
-```
-
 Run:
-
-```bash
-npx @modelcontextprotocol/inspector python -m app.mcp.server
-```
-
-or
 
 ```bash
 npx @modelcontextprotocol/inspector uv run python -m app.mcp.server
 ```
 
-Open the provided localhost URL.
+Open the generated URL.
 
-Test tools:
+Available tools:
 
 * create_student
 * get_students
 
 ---
 
-## Claude Desktop Integration
+## Claude Desktop Configuration
 
-Locate Claude Desktop MCP configuration file.
-
-Add:
+Open Claude Desktop MCP configuration file and add:
 
 ```json
 {
   "mcpServers": {
     "Teacher-Assistance": {
-      "command": "D:\\path\\to\\project\\.venv\\Scripts\\python.exe",
+      "command": "D:\\Projects\\TeacherAssist-MCP\\.venv\\Scripts\\python.exe",
       "args": [
         "-m",
         "app.mcp.server"
       ],
-      "cwd": "D:\\path\\to\\project"
+      "cwd": "D:\\Projects\\TeacherAssist-MCP"
     }
   }
 }
 ```
 
-Replace paths with your own installation paths.
+Replace the paths with your own project location.
 
 Restart Claude Desktop.
 
 ---
 
-## Example Tool Usage
+## API Examples
 
-Create Student:
+### Create Student
+
+POST `/students`
 
 ```json
 {
   "student_id": 101,
-  "name": "Monirul Islam"
+  "name": "Monirul Islam",
+  "email": "student@example.com"
 }
 ```
 
@@ -265,24 +254,58 @@ Response:
 ```json
 {
   "student_id": 101,
-  "name": "Monirul Islam"
+  "name": "Monirul Islam",
+  "email": "student@example.com"
 }
 ```
 
-Get Students:
+A confirmation email will automatically be sent.
+
+---
+
+### Get Students
+
+GET `/students`
+
+Response:
 
 ```json
 [
   {
     "student_id": 101,
-    "name": "Monirul Islam"
+    "name": "Monirul Islam",
+    "email": "student@example.com"
   }
 ]
 ```
 
 ---
 
+## Example Claude Desktop Prompts
+
+```text
+Create a student with ID 1001, name Monirul Islam, email monirul@gmail.com
+```
+
+```text
+Show all students
+```
+
+Claude will invoke MCP tools automatically.
+
+---
+
 ## Common Issues
+
+### ModuleNotFoundError: app
+
+Run from project root:
+
+```bash
+uv run python -m app.mcp.server
+```
+
+---
 
 ### PostgreSQL Connection Error
 
@@ -290,20 +313,8 @@ Verify:
 
 * PostgreSQL service is running
 * Database exists
-* Username/password are correct
+* Credentials are correct
 * DATABASE_URL is correct
-
----
-
-### ModuleNotFoundError: app
-
-Run from project root:
-
-```bash
-cd TeacherAssist-MCP
-
-python -m app.mcp.server
-```
 
 ---
 
@@ -311,26 +322,26 @@ python -m app.mcp.server
 
 Verify:
 
-* Virtual environment path is correct
-* `cwd` points to project root
-* MCP server starts manually
-* Claude Desktop has been restarted
+* Correct Python executable path
+* Correct cwd path
+* MCP server runs manually
+* Claude Desktop restarted after config change
 
 ---
 
-### Duplicate Key Error
+### Gmail Authentication Failed
 
-```text
-duplicate key value violates unique constraint
-```
+Use a Google App Password.
 
-Cause:
+Do not use your normal Gmail password.
 
-Student ID already exists.
+---
 
-Solution:
+### Duplicate Student ID
 
-Use a new unique `student_id`.
+Student IDs must be unique.
+
+Use a new ID when creating students.
 
 ---
 
@@ -338,13 +349,13 @@ Use a new unique `student_id`.
 
 * Update Student
 * Delete Student
-* Add Marks
-* Grade Generation
 * Attendance Management
+* Grade Calculation
+* GPA Calculation
 * Student Reports
-* AI-powered Academic Analytics
-* FastAPI REST API
-* Authentication and Authorization
+* AI-powered Analytics
+* Authentication & Authorization
+* Multi-user Support
 
 ---
 
@@ -352,12 +363,10 @@ Use a new unique `student_id`.
 
 MIT License
 
-Feel free to use, modify, and contribute.
-
 ---
 
 ## Author
 
 Monirul Islam
 
-TeacherAssist-MCP is a beginner-friendly MCP project demonstrating how AI assistants can interact with PostgreSQL databases through the Model Context Protocol (MCP).
+TeacherAssist-MCP demonstrates how AI assistants can interact with PostgreSQL databases through FastMCP and the Model Context Protocol (MCP), while integrating FastAPI APIs and automated email notifications.
