@@ -8,7 +8,7 @@ mcp = FastMCP("TeacherAssist-MCP")
 
 
 @mcp.tool()
-def create_student(student_id: int, name: str):
+def create_student(student_id: int, name: str, email: str):
     """
     Create a new student in the database.
 
@@ -19,7 +19,7 @@ def create_student(student_id: int, name: str):
     Returns:
         Student information after creation.
     """
-    return create_student_tool(student_id, name)
+    return create_student_tool(student_id, name, email)
 
 
 @mcp.tool()

@@ -34,7 +34,7 @@ def health():
 # ======================
 @app.post("/students")
 def add_student(student: StudentCreate, db: Session = Depends(get_db)):
-    return create_student(db, student.student_id, student.name)
+    return create_student(db, student.student_id, student.name, student.email)
 
 
 # ======================

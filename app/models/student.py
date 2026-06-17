@@ -6,4 +6,5 @@ class Student(Base):
     
     student_id = Column(Integer, primary_key=True, index=True, autoincrement=False)
     name = Column(String, nullable=False)
+    email = Column(String, nullable=False)
     
