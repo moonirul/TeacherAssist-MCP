@@ -7,16 +7,14 @@ from sqlalchemy.orm import sessionmaker
 
 load_dotenv()
 
-DATABASE = os.getenv("DATABASE")
-USERNAME = os.getenv("USERNAME")
-PASSWORD = os.getenv("PASSWORD")
-HOST = os.getenv("HOST")
-PORT = os.getenv("PORT")
-DATABASE_NAME = os.getenv("DATABASE_NAME")
+DB_DRIVER = os.getenv("DB_DRIVER")
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
+DB_NAME = os.getenv("DB_NAME")
 
-DATABASE_URL = (
-    f"{DATABASE}://{USERNAME}:{PASSWORD}@{HOST}:{PORT}/{DATABASE_NAME}"
-)
+DATABASE_URL = f"{DB_DRIVER}://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 engine = create_engine(DATABASE_URL)
 
