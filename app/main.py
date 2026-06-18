@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from app.db.database import engine, Base
 
 from app.routes.student import router as student_router
+from app.routes.subject import router as subject_router
 
 
 # create tables
@@ -16,6 +17,9 @@ app = FastAPI(
 
 # routers
 app.include_router(student_router, prefix="/students", tags=["Students"])
+
+app.include_router(subject_router, prefix="/subjects", 
+                   tags=["Subjects"])
 
 
 @app.get("/")
