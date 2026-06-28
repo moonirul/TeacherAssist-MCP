@@ -87,3 +87,11 @@ dependencies = [
     "watchfiles==1.2.0",
     "websockets==16.0",
 ]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+exclude = ["reports*"]

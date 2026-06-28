@@ -25,7 +25,7 @@ def create_student(db: Session, student:StudentCreate):
     db.commit()
     db.refresh(new_student)
 
-    send_student_email(new_student)
+    # send_student_email(new_student)
 
     return {
     "student_id": student.student_id,
@@ -49,6 +49,12 @@ def get_students(db: Session):
         }
         for s in students
     ]
+    
+    
+    
+    
+    
+
 
 
 
