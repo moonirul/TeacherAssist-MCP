@@ -423,9 +423,9 @@ This project is licensed under the **MIT License**. See the **LICENSE** file for
 
 **Monirul Islam**
 
-* 🔗 GitHub: https://github.com/monirul8888
-* 💼 LinkedIn: https://linkedin.com/in/monirul154
-* 🌐 Portfolio: https://moniirul.vercel.app
+* 🔗 GitHub: https://github.com/moonirul
+* 💼 LinkedIn: https://linkedin.com/in/moonirul
+
 
 ---
 
