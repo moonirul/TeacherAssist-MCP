@@ -1,5 +1,8 @@
 from sqlalchemy import Column, Integer, Float, ForeignKey, String
 from sqlalchemy.orm import relationship
+from app.models.subject import Subject
+from app.models.exam import Exam
+from app.models.student import Student
 
 from app.db.database import Base
 
